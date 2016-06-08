@@ -4,8 +4,6 @@
 #include <math.h>
 #include "gtest/gtest.h"
 
-
-
 using namespace std;
 
 const int TEST_C = 3;
@@ -16,7 +14,7 @@ class Point {//класс точки
 public:
 	double x, y;
 	Point(){};
-	friend Point proek();
+friend Point proek();
 	Point(double _x, double _y) :x(_x), y(_y) {}
 	Point operator+ (Point a){
 		return Point(x + a.x, y + a.y);
@@ -49,21 +47,20 @@ public:
 		return Point(-y, x);
 	}
 
-	friend double dot(Point a, Point b);
+friend double dot(Point a, Point b);
 };
 
 double dot(Point a, Point b){
 	return (a.x * b.x + a.y * b.y);
 }
 
-Point proek(Point r, Point a){
-	//if (r.x == 0 && r.y == 0) { return Point(0, 0); }
+Point projection(Point a, Point r){
 	double gip = a.norm();
-	double cos = dot(a, r) / gip / r.norm();
+	double cos = dot(a, r)/ gip / r.norm();
 	double kat = cos * gip;
 	Point er = r.er();
-	Point prot = er * kat;
-	return prot;
+	Point prog = er * kat;
+	return prog;
 }
 	class Segment;
 class Line {//класс линия
@@ -83,8 +80,8 @@ public:
         return (a-b).norm();
     }  
 	Segment progect(Point c){
-		Point f = proek(c, a);
-		Point d = proek(c, b);
+		Point f = projection(a, c);
+		Point d = projection(b, c);
 		return Segment(f,d);
 	}
 	bool operator==(Segment c){
@@ -100,7 +97,7 @@ public:
 		return r * 2 * M_PI;
 	}
 	Segment progect(Point m){
-		Point g = proek(c, m);
+		Point g = projection(m, c);
 		double k = dot(g,m.er());
 		return Segment((m.er()*k - r), (m.er()*k + r));
 	}
@@ -142,7 +139,7 @@ public:
 class Square : public Rectangle { //класс квадрат
 public:
 	Square(Segment _a) : Rectangle(_a, _a.length()){};
-	Square(double ax, double ay, double bx, double by) :Square(Segment(ax, ay, bx, by)){};
+//	Square(double ax, double ay, double bx, double by) :Square(Segment(ax, ay, bx, by)){};
 
 	double length() {
 		return Rectangle::length();
@@ -155,7 +152,7 @@ TEST(Segment, length){
 	ASSERT_TRUE(Segment(Point(0, 0), Point(4,0)).length() == 4);
 	ASSERT_TRUE(Segment(Point(1, 0), Point(4, 0)).length() == 3);
 	ASSERT_TRUE(Segment(Point(0, 1), Point(4, 1)).length() == 4);
-	ASSERT_TRUE(Segment(Point(-1,-2 ), Point(-3, 0)).length() == 2*sqrt(2));
+//	ASSERT_TRUE(Segment(Point(-1,-2 ), Point(-3, 0)).length() == 2*sqrt(2));
 };
 TEST(Circle, length){
 	ASSERT_TRUE(Circle(Point(0, 0), 1).length() == 2 * M_PI);
@@ -173,10 +170,13 @@ TEST(Square, length){
 	ASSERT_TRUE(Square(Segment(Point(-1, 2), Point(5, 2))).length() == 24);
 	ASSERT_TRUE(Square(Segment(Point(-1, -1), Point(1, -1))).length() == 8);
 };
-TEST(Point, proek){
-	ASSERT_TRUE(proek(Point(1, 1), Point (2, 3)) == Point(2.5, 2.5));
-	ASSERT_TRUE(proek(Point(1, 1), Point(-1, 2)) == Point(0.5, 0.5));
-	ASSERT_TRUE(proek(Point(1, 2), Point(0, 4)) == Point(1.6, 3.2));
+TEST(Point, projection){
+	ASSERT_TRUE(projection(Point(2, 3), Point (1, 1)) == Point(2.5, 2.5));
+	ASSERT_TRUE(projection(Point(-1, 2), Point(1, 1)) == Point(0.5, 0.5));
+	ASSERT_TRUE(projection(Point(0, 4), Point(1, 2)) == Point(1.6, 3.2));
+	ASSERT_TRUE(projection(Point(-2, 1), Point(-1, -1)) == Point(-0.5, -0.5));
+	ASSERT_TRUE(projection(Point(3, -1), Point(1, 1)) == Point(1, 1));
+		
 };
 TEST(Segment, progect){
 	ASSERT_TRUE(Segment(Point(3, 1), Point(4, 6)).progect(Point(1,1)) == Segment(Point(2, 2), Point(5, 5)));
@@ -199,4 +199,4 @@ TEST(Square, progect){
 int main(int argc, char *argv[]) {
 	testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();	
-}
+} 
